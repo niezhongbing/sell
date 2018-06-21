@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://localhost/ordersystem?characterEncoding=utf-8&useSSL=false
+  jpa:
+    show-sql: true
+  application:
+    name: sell
+#全局字段返回值为null ,则就不将此字段返回
+#  jackson:
+#    default-property-inclusion: non_null
+server:
+  port: 8080
+  servlet:
+    context-path: /sell
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:31000/eureka/
+mybatis:
+  mapper-locations: classpath:mapping/*.xml
+
+
+#  logging:
+#  path: /logs
+#  config: classpath:logback-spring.xml
+
