@@ -62,7 +62,7 @@ public class BuyerOrderController {
         map.put("orderId", createResult.getOrderId());
         return ResultVOUtil.success(map);
     }
-
+   
     @RequestMapping("/list")
     @ApiModelProperty(value = "查询订单列表", notes = "查询订单列表")
     public ResultVO<Page<OrderDTO>> list(@RequestParam("openid") String openid,
