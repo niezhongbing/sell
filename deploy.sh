@@ -22,6 +22,7 @@ killTomcat()
 }
 cd $PROJ_PATH
 rm -rf target
+rm -rf $PROJ_PATH/src/test
 mvn clean install
 
 
