@@ -16,7 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -44,6 +43,12 @@ public class BuyerOrderController {
         return ResultVOUtil.success();
     }
 
+//    public static void main(String[] args) {
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.set
+//        int i = calendar.get(Calendar.MONTH);
+//        System.out.println(i);
+//    }
     @RequestMapping(value = "create", method = RequestMethod.POST)
     @ApiModelProperty(value = "创建订单1", notes = "创建订单")
     public ResultVO<Map<String, String>> create(@Valid OrderForm orderForm, BindingResult bindingResult) {

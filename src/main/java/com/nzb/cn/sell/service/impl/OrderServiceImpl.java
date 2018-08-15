@@ -1,6 +1,5 @@
 package com.nzb.cn.sell.service.impl;
 
-import com.nzb.cn.sell.converter.OrderMaster2OrderDTOConverter;
 import com.nzb.cn.sell.dao.OrderDetailRepository;
 import com.nzb.cn.sell.dao.OrderMapper;
 import com.nzb.cn.sell.dao.OrderMasterRepository;
@@ -20,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,23 +52,22 @@ public class OrderServiceImpl implements OrderService {
 
         BigDecimal orderAmount = new BigDecimal(BigInteger.ZERO);
         //1.查询商品（数量，价格）
-            for (OrderDetail orderDetail: orderDTO.getOrderDetailList())
-            {
-                ProductInfo productInfo = productService.findOne(orderDetail.getProductId());
-                if(productInfo == null){
-                    throw new SellException(ResultEnum.PRODUCT_NOT_EXIST);
-                }
-                 //2.计算总价
-                System.out.println(orderDetail.getProductQuantity());
-                orderAmount = productInfo.getProductPrice().
+        for (OrderDetail orderDetail : orderDTO.getOrderDetailList()) {
+            ProductInfo productInfo = productService.findOne(orderDetail.getProductId());
+            if (productInfo == null) {
+                throw new SellException(ResultEnum.PRODUCT_NOT_EXIST);
+            }
+            //2.计算总价
+            System.out.println(orderDetail.getProductQuantity());
+            orderAmount = productInfo.getProductPrice().
                     multiply(new BigDecimal(orderDetail.getProductQuantity()))
                     .add(orderAmount);
 
-                orderDetail.setDetailId(KeyUtil.genUniqueKey());
-                orderDetail.setOrderId(orderId);
-                BeanUtils.copyProperties(productInfo, orderDetail);
-                orderDetailRepository.save(orderDetail);
-            }
+            orderDetail.setDetailId(KeyUtil.genUniqueKey());
+            orderDetail.setOrderId(orderId);
+            BeanUtils.copyProperties(productInfo, orderDetail);
+            orderDetailRepository.save(orderDetail);
+        }
         //3.写入订单数据
         OrderMaster orderMaster = new OrderMaster();
         orderDTO.setOrderId(orderId);
@@ -102,25 +99,26 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDTO findOne(String orderId) {
         OrderMaster orderMaster = orderMasterRepository.findOne(orderId);
-        if (orderMaster == null){
+        if (orderMaster == null) {
             throw new SellException(ResultEnum.ORDER_NOT_EXIST);
         }
         List<OrderDetail> list = orderDetailRepository.findByOrderId(orderMaster.getOrderId());
-        if(CollectionUtils.isEmpty(list)){
-            throw  new SellException(ResultEnum.ORDERDETAIL_NOT_EXIST);
+        if (CollectionUtils.isEmpty(list)) {
+            throw new SellException(ResultEnum.ORDERDETAIL_NOT_EXIST);
         }
         OrderDTO orderDTO = new OrderDTO();
-        BeanUtils.copyProperties(orderMaster,orderDTO);
+        BeanUtils.copyProperties(orderMaster, orderDTO);
         orderDTO.setOrderDetailList(list);
         return orderDTO;
     }
 
     @Override
     public Page<OrderDTO> findList(String buyerOpenid, Pageable pageable) {
-        Page<OrderMaster> orderMasters = orderMasterRepository.findByBuyerOpenid(buyerOpenid, pageable);
-        List<OrderMaster> content = orderMasters.getContent();
-
-        return new PageImpl<>(OrderMaster2OrderDTOConverter.convert(content),pageable,orderMasters.getTotalElements());
+//        Page<OrderMaster> orderMasters = orderMasterRepository.findByBuyerOpenid(buyerOpenid, pageable);
+//        List<OrderMaster> content = orderMasters.getContent();
+//
+//        return new PageImpl<>(OrderMaster2OrderDTOConverter.convert(content), pageable, orderMasters.getTotalElements());
+        return null;
     }
 
     @Override
@@ -128,34 +126,34 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO cancel(OrderDTO orderDTO) {
         OrderMaster orderMaster = new OrderMaster();
         //1.查询订单状态
-        if(!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())){
+        if (!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())) {
             log.error("【取消订单】订单状态不正确, orderId={}, orderStatus={}", orderDTO.getOrderId(), orderDTO.getOrderStatus());
             throw new SellException(ResultEnum.ORDER_STATUS_ERROR);
         }
 
         //2修改订单状态
         orderDTO.setOrderStatus(OrderStatusEnum.CANCEL.getCode());
-        BeanUtils.copyProperties(orderDTO,orderMaster);
+        BeanUtils.copyProperties(orderDTO, orderMaster);
         OrderMaster updateResult = orderMasterRepository.save(orderMaster);
-        if(updateResult == null){
+        if (updateResult == null) {
             log.error("【取消订单】更新失败, orderMaster={}", orderMaster);
             throw new SellException(ResultEnum.ORDER_UPDATE_FAIL);
         }
 
         //3.修改库存
         List<OrderDetail> orderDetailList = orderDTO.getOrderDetailList();
-        if(CollectionUtils.isEmpty(orderDetailList)){
+        if (CollectionUtils.isEmpty(orderDetailList)) {
             log.error("【取消订单】订单中无商品详情, orderDTO={}", orderDTO);
             throw new SellException(ResultEnum.ORDER_DETAIL_EMPTY);
         }
 
         List<CartDTO> list = orderDetailList.stream()
-                             .map(e -> new CartDTO(e.getProductId(),e.getProductQuantity()))
-                             .collect(Collectors.toList());
+                .map(e -> new CartDTO(e.getProductId(), e.getProductQuantity()))
+                .collect(Collectors.toList());
 
         productService.increaseStock(list);
         //4.如果是已支付，需要退款
-        if(orderDTO.getPayStatus().equals(PayStatusEnum.SUCCESS)){
+        if (orderDTO.getPayStatus().equals(PayStatusEnum.SUCCESS)) {
             //TODO
         }
 
@@ -166,16 +164,16 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDTO finish(OrderDTO orderDTO) {
         //判断订单状态
-        if(!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())){
+        if (!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())) {
             log.error("【完结订单】订单状态不正确, orderId={}, orderStatus={}", orderDTO.getOrderId(), orderDTO.getOrderStatus());
             throw new SellException(ResultEnum.ORDER_STATUS_ERROR);
         }
         //修改订单状态
         orderDTO.setOrderStatus(OrderStatusEnum.FINISHED.getCode());
         OrderMaster orderMaster = new OrderMaster();
-        BeanUtils.copyProperties(orderDTO,orderMaster);
-        OrderMaster updateMaster =   orderMasterRepository.save(orderMaster);
-        if(updateMaster == null){
+        BeanUtils.copyProperties(orderDTO, orderMaster);
+        OrderMaster updateMaster = orderMasterRepository.save(orderMaster);
+        if (updateMaster == null) {
             log.error("【完结订单】更新失败, orderMaster={}", orderMaster);
             throw new SellException(ResultEnum.ORDER_UPDATE_FAIL);
         }
@@ -187,20 +185,20 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDTO paid(OrderDTO orderDTO) {
         //判断订单状态
-        if(!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())){
+        if (!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())) {
             log.error("【订单支付完成】订单状态不正确, orderId={}, orderStatus={}", orderDTO.getOrderId(), orderDTO.getOrderStatus());
             throw new SellException(ResultEnum.ORDER_STATUS_ERROR);
         }
         //判断支付状态
-        if(orderDTO.getPayStatus().equals(PayStatusEnum.WAIT.getCode())){
+        if (orderDTO.getPayStatus().equals(PayStatusEnum.WAIT.getCode())) {
             log.error("【订单支付完成】订单支付状态不正确, orderId={}, orderStatus={}", orderDTO.getOrderId(), orderDTO.getOrderStatus());
         }
         //修改支付状态
         orderDTO.setPayStatus(PayStatusEnum.SUCCESS.getCode());
         OrderMaster orderMaster = new OrderMaster();
-        BeanUtils.copyProperties(orderDTO,orderMaster);
-        OrderMaster updateMaster =   orderMasterRepository.save(orderMaster);
-        if(updateMaster == null){
+        BeanUtils.copyProperties(orderDTO, orderMaster);
+        OrderMaster updateMaster = orderMasterRepository.save(orderMaster);
+        if (updateMaster == null) {
             log.error("【订单支付完成】更新失败, orderMaster={}", orderMaster);
             throw new SellException(ResultEnum.ORDER_UPDATE_FAIL);
         }

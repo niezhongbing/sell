@@ -3,8 +3,8 @@ package com.nzb.cn.sell.service.impl;
 import com.nzb.cn.sell.dto.OrderDTO;
 import com.nzb.cn.sell.entity.dbPojo.OrderDetail;
 import com.nzb.cn.sell.entity.dbPojo.OrderMaster;
+import com.nzb.cn.sell.service.RedisLock;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -26,6 +23,9 @@ public class OrderServiceImplTest {
 
     @Autowired
     private OrderServiceImpl orderService;
+
+    @Autowired
+    private RedisLock redisLock;
 
 
     private final String BUYER_OPENID = "1101110";
@@ -104,5 +104,11 @@ public class OrderServiceImplTest {
 
     @Test
     public void findList1() {
+        Long time = System.currentTimeMillis()+10*1000;
+        if(!redisLock.lock("1",String.valueOf(time))){
+            log.info("加锁失败");
+        }
+        redisLock.unlock("1",String.valueOf(time));
+
     }
 }

@@ -3,7 +3,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: root
-    url: jdbc:mysql://47.93.9.151/ordersystem?characterEncoding=utf-8&useSSL=false
+    url: jdbc:mysql://193.112.121.126/ordersystem?characterEncoding=utf-8&useSSL=false
   jpa:
     show-sql: true
   application:
@@ -21,6 +21,10 @@ server:
 #      defaultZone: http://localhost:31000/eureka/
 mybatis:
   mapper-locations: classpath:mapping/*.xml
+Order:
+  ribbon:
+   Nfloadbalancerruleclassname: com.netflix.loadbalancer.RandomRule
+
 
 
 #  logging:

@@ -15,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface OrderMasterRepository extends JpaRepository<OrderMaster, String> {
 
-    Page<OrderMaster> findByBuyerOpenid(String buyerOpenid, Pageable pageable);
+   // Page<OrderMaster> findByBuyerrepository(String buyerOpenid, Pageable pageable);
 
 
     @Query(value = "select * from order_master where order_id = :orderId",nativeQuery=true)
