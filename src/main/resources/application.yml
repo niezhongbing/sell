@@ -1,33 +1,37 @@
 spring:
+  application:
+    name: sell
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: root
-    url: jdbc:mysql://193.112.121.126/ordersystem?characterEncoding=utf-8&useSSL=false
+    url: jdbc:mysql://localhost/ordersystem?characterEncoding=utf-8&useSSL=false
   jpa:
     show-sql: true
-  application:
-    name: sell
+  rabbitmq:
+    host: 127.0.0.1
+    port:  15672
+    username: guest
+    password: guest
 #全局字段返回值为null ,则就不将此字段返回
 #  jackson:
 #    default-property-inclusion: non_null
 server:
-  port: 8082
-  servlet:
-    context-path: /sell
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://localhost:31000/eureka/
+  context-path: /sell
+  port: 9999
+  #eureka:
+  #  client:
+  #    serviceUrl:
+  #      defaultZone: http://localhost:31000/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: http://${spring.cloud.client.ipAddress}:${server.port}/swagger-ui.html
 mybatis:
   mapper-locations: classpath:mapping/*.xml
 Order:
   ribbon:
-   Nfloadbalancerruleclassname: com.netflix.loadbalancer.RandomRule
+    Nfloadbalancerruleclassname: com.netflix.loadbalancer.RandomRule
 
-
-
-#  logging:
+#logging:
 #  path: /logs
 #  config: classpath:logback-spring.xml
-
