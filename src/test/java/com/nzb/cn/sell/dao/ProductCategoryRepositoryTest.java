@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -40,15 +41,15 @@ public class ProductCategoryRepositoryTest {
     @Test
     public void updateTest(){
         ProductCategory pc = product.findOne(7);
-        pc.setCategoryType(6);
+        pc.setCategoryType(3);
 
         product.save(pc);
     }
 
     @Test
     public void findByCategoryTypeIn(){
-        List<Integer> list = new ArrayList<>();
-        list.add(1);
+        List<Integer> list = Arrays.asList(2,3,4);
+
         List<ProductCategory> byCategoryTypeIn = product.findByCategoryTypeIn(list);
         Assert.assertNotEquals(0,byCategoryTypeIn.size());
     }

@@ -68,7 +68,7 @@ public class BuyerOrderController {
         return ResultVOUtil.success(map);
     }
    
-    @RequestMapping("/list")
+    @RequestMapping(value = "list",method = RequestMethod.GET)
     @ApiModelProperty(value = "查询订单列表", notes = "查询订单列表")
     public ResultVO<Page<OrderDTO>> list(@RequestParam("openid") String openid,
                                          @RequestParam(value = "page", defaultValue = "0") Integer page,
@@ -82,7 +82,7 @@ public class BuyerOrderController {
         return ResultVOUtil.success(orderDTOPage);
     }
 
-    @RequestMapping("/detail")
+    @RequestMapping(value = "/detail",method = RequestMethod.GET)
     @ApiModelProperty(value = "查询订单详情", notes = "查询订单详情")
     public ResultVO<OrderDTO> detail(@RequestParam("openid") String openid,
                                      @RequestParam("orderid") String orderid) {
@@ -90,7 +90,7 @@ public class BuyerOrderController {
         return ResultVOUtil.success(orderDTO);
     }
 
-    @RequestMapping("/cancel")
+    @RequestMapping(value = "/cancel",method = RequestMethod.GET)
     @ApiModelProperty(value = "订单取消", notes = "订单取消")
     public ResultVO<OrderDTO> cancel(@RequestParam("openid") String openid,
                                      @RequestParam("orderid") String orderid) {

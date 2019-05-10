@@ -23,7 +23,7 @@ public class HttpAspect {
     public void doBefore(JoinPoint joinPoint){
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
-        log.info("HttpAspect Controller Before");
+              log.info("HttpAspect Controller Before");
         log.info("url={}",request.getRequestURL());
         log.info("method={}",request.getMethod());
         log.info("ip={}",request.getRemoteAddr());

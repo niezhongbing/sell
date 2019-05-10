@@ -3,7 +3,6 @@ package com.nzb.cn.sell.service.impl;
 import com.nzb.cn.sell.dto.OrderDTO;
 import com.nzb.cn.sell.entity.dbPojo.OrderDetail;
 import com.nzb.cn.sell.entity.dbPojo.OrderMaster;
-import com.nzb.cn.sell.service.RedisLock;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;

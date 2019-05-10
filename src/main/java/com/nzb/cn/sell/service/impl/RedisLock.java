@@ -1,4 +1,4 @@
-package com.nzb.cn.sell.service;
+package com.nzb.cn.sell.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.core.Commit;
